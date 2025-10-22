@@ -4,6 +4,15 @@ document.addEventListener("DOMContentLoaded", () => {
   const signupForm = document.getElementById("signup-form");
   const messageDiv = document.getElementById("message");
 
+  // Helper to create initials from an email (first letters of local-part segments)
+  function getInitials(email) {
+    const local = (email || "").split("@")[0] || "";
+    const parts = local.split(/[._-]/).filter(Boolean);
+    if (parts.length === 0) return (local.slice(0, 2) || "").toUpperCase();
+    const initials = parts.map(p => p[0].toUpperCase()).slice(0, 2).join("");
+    return initials;
+  }
+
   // Function to fetch activities from API
   async function fetchActivities() {
     try {
@@ -12,6 +21,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
       // Clear loading message
       activitiesList.innerHTML = "";
+
+      // Reset activity select (keep placeholder)
+      activitySelect.innerHTML = '<option value="">-- Select an activity --</option>';
 
       // Populate activities list
       Object.entries(activities).forEach(([name, details]) => {
@@ -25,7 +37,38 @@ document.addEventListener("DOMContentLoaded", () => {
           <p>${details.description}</p>
           <p><strong>Schedule:</strong> ${details.schedule}</p>
           <p><strong>Availability:</strong> ${spotsLeft} spots left</p>
+
+          <div class="participants">
+            <h5>Participants</h5>
+            <ul class="participants-list">
+              <!-- participant items will be inserted here -->
+            </ul>
+          </div>
         `;
+
+        // Populate participants list
+        const ul = activityCard.querySelector(".participants-list");
+        if (!details.participants || details.participants.length === 0) {
+          const li = document.createElement("li");
+          li.className = "no-participants";
+          li.textContent = "No participants yet";
+          ul.appendChild(li);
+        } else {
+          details.participants.forEach((p) => {
+            const li = document.createElement("li");
+            const avatar = document.createElement("span");
+            avatar.className = "avatar";
+            avatar.textContent = getInitials(p);
+
+            const text = document.createElement("span");
+            text.className = "participant-email";
+            text.textContent = p;
+
+            li.appendChild(avatar);
+            li.appendChild(text);
+            ul.appendChild(li);
+          });
+        }
 
         activitiesList.appendChild(activityCard);
 
