@@ -157,9 +157,8 @@ footer {
 }
 
 .participants ul {
-  list-style: disc;
-  list-style-position: inside;
-  padding-left: 18px;
+  list-style: none; /* hide bullets */
+  padding-left: 0;
   margin-top: 8px;
 }
 
@@ -174,6 +173,23 @@ footer {
   border: 1px solid #e6ecff;
   font-size: 14px;
   color: #1a237e;
+}
+
+/* delete button next to participant */
+.delete-participant {
+  margin-left: auto;
+  background: transparent;
+  border: none;
+  color: #c62828;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 4px;
+}
+
+.delete-participant:hover {
+  background-color: rgba(198, 40, 40, 0.08);
 }
 
 /* small circular avatar with initials */

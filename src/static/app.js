@@ -64,8 +64,39 @@ document.addEventListener("DOMContentLoaded", () => {
             text.className = "participant-email";
             text.textContent = p;
 
+            // Delete button
+            const del = document.createElement("button");
+            del.className = "delete-participant";
+            del.title = `Unregister ${p}`;
+            del.setAttribute("aria-label", `Unregister ${p} from ${name}`);
+            del.innerHTML = "&times;"; // simple X icon
+
+            del.addEventListener("click", async () => {
+              // confirm before unregistering
+              if (!confirm(`Unregister ${p} from ${name}?`)) return;
+
+              try {
+                const resp = await fetch(
+                  `/activities/${encodeURIComponent(name)}/unregister?email=${encodeURIComponent(p)}`,
+                  { method: "POST" }
+                );
+
+                const res = await resp.json();
+                if (resp.ok) {
+                  // refresh activities to update UI
+                  fetchActivities();
+                } else {
+                  alert(res.detail || "Failed to unregister");
+                }
+              } catch (err) {
+                console.error("Error unregistering:", err);
+                alert("Failed to unregister. Please try again.");
+              }
+            });
+
             li.appendChild(avatar);
             li.appendChild(text);
+            li.appendChild(del);
             ul.appendChild(li);
           });
         }
@@ -105,6 +136,8 @@ document.addEventListener("DOMContentLoaded", () => {
         messageDiv.textContent = result.message;
         messageDiv.className = "success";
         signupForm.reset();
+        // Refresh activities so the new participant shows up immediately
+        fetchActivities();
       } else {
         messageDiv.textContent = result.detail || "An error occurred";
         messageDiv.className = "error";
